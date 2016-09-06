@@ -1,6 +1,7 @@
 name: CarePackageDrops
 main: net.projectzombie.care_package.Main
 version: 1.0
+depend: [RegionRotation]
 commands:
   cp:
     description: Nope.

@@ -21,12 +21,12 @@ package net.projectzombie.care_package;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 import java.util.logging.Level;
-import net.projectzombie.care_package.files.StateFile;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -40,8 +40,17 @@ import org.bukkit.inventory.PlayerInventory;
  * within the care package drop.
  * 
  */
-public class PackageHandler {
-    
+public class PackageHandler
+{
+    private static PackageHandler INSTANCE = null;
+
+    static protected PackageHandler instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new PackageHandler();
+        }
+        return INSTANCE;
+    }
+
     private static final Random RAND = new Random();
     private static final String CONFIG_FILE_NAME = "chest_configs.yml";
     private static final String ROOT_PATH = "chest_configs";
@@ -50,7 +59,6 @@ public class PackageHandler {
     
     /**
      * Initializes config file.
-     * @param plugin Bukkit plugin.
      */
     public PackageHandler()
     {
@@ -61,28 +69,40 @@ public class PackageHandler {
      * Returns random package defined within the configuration file.
      * @return Random ItemStack from serialized string in config.
      */
-    public ArrayList<ItemStack> getRandPackage()
+    public ItemStack[] getRandPackage()
     {   
-        final String chestName;
-        ArrayList<String> chestList = new ArrayList<>();
+        final String packageName;
+        final ArrayList<String> packageNames = new ArrayList<>();
+        final ArrayList<ItemStack> chestItems;
+        final ItemStack[] toRet = new ItemStack[27];
         
         if (!chestConfig.contains(ROOT_PATH))
             return null;
-        
-        for (String key : chestConfig.getConfigurationSection(ROOT_PATH).getKeys(false))
-        {
-            chestList.add(key);
-        }
-      
-        if (chestList.isEmpty())
+
+        packageNames.addAll(chestConfig.getConfigurationSection(ROOT_PATH).getKeys(false));
+        if (packageNames.isEmpty())
         {
             Bukkit.getServer().getLogger().info("[CarePackage] No chests exist. Cannot initate drop.");
             return null;
         }
-        
-        chestName = chestList.get(RAND.nextInt(chestList.size()));
-        chestList.clear();
-        return this.getPackage(chestName);
+
+        packageName = packageNames.get(RAND.nextInt(packageNames.size()));
+        chestItems = this.getPackage(packageName);
+
+        if (chestItems == null || chestItems.isEmpty()) {
+            return null;
+        }
+
+        while (chestItems.size() < 27) {
+            chestItems.add(new ItemStack(Material.AIR));
+        }
+
+        Collections.shuffle(chestItems);
+        for (int i = 0; i < 27; i++) {
+            toRet[i] = chestItems.get(i);
+        }
+
+        return toRet;
     }
     
     private ArrayList<ItemStack> getPackage(final String packageName)
@@ -99,9 +119,15 @@ public class PackageHandler {
      * @param sender Command sender.
      * @param packageName Name of the package.
      */
-    public void createPackage(final Player sender,
+    public void createPackage(final CommandSender sender,
                               final String packageName) 
     {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Must be a player to recieve package.");
+            return;
+        }
+
+        final Player player = (Player)sender;
         if (chestConfig == null)
         {
             sender.sendMessage("The file is null! Please contact the server administrator.");
@@ -109,7 +135,7 @@ public class PackageHandler {
         }
         
         final ArrayList<ItemStack> inventoryItems = new ArrayList<>();
-        final PlayerInventory inventory = sender.getInventory();
+        final PlayerInventory inventory = player.getInventory();
         ItemStack tempItem;
         
         for (int i = 9; i <= 35; i++)
@@ -130,7 +156,7 @@ public class PackageHandler {
      * @param sender Command sender.
      * @param packageName Name of the package.
      */
-    public void removePackage(final Player sender,
+    public void removePackage(final CommandSender sender,
                               final String packageName)
     {
         if (chestConfig == null)
@@ -148,9 +174,15 @@ public class PackageHandler {
             sender.sendMessage(packageName + " does not exist");
     }
     
-    public void getPlayerPackage(final Player sender,
+    public void getPlayerPackage(final CommandSender sender,
                                  final String packageName)
     {
+        if (!(sender instanceof Player)) {
+            sender.sendMessage("Must be a player to receive package.");
+            return;
+        }
+
+        final Player player = (Player)sender;
         if (!chestConfig.contains(ROOT_PATH + "." + packageName))
         {
             sender.sendMessage("Chest does not exist.");
@@ -165,12 +197,12 @@ public class PackageHandler {
         }
             
         for (int i = 0; i < items.size(); i++)
-            sender.getInventory().setItem(i+9, items.get(i));
-        
+            player.getInventory().setItem(i+9, items.get(i));
+
         sender.sendMessage("Package " + packageName + " recieved.");
     }
     
-    public void listPackages(final Player sender)
+    public void listPackages(final CommandSender sender)
     {
         sender.sendMessage("Packages:");
         for (String key : chestConfig.getConfigurationSection(ROOT_PATH).getKeys(false))
@@ -184,8 +216,8 @@ public class PackageHandler {
      */
     private void loadConfig()
     {
-        if (chestFile == null) 
-            chestFile = new File(StateFile.getFolder(), CONFIG_FILE_NAME);
+        if (chestFile == null)
+            chestFile = new File(Main.getPlugin().getDataFolder(), CONFIG_FILE_NAME);
 
         chestConfig = new YamlConfiguration();
         chestConfig = YamlConfiguration.loadConfiguration(chestFile);
@@ -202,8 +234,7 @@ public class PackageHandler {
         try {
             chestConfig.save(chestFile);
         } catch (IOException e) {
-            StateFile.getPlugin().getLogger().log(Level.SEVERE, "Could not save config to "
-                    + chestConfig, e);
+            Main.getPlugin().getLogger().log(Level.SEVERE, "Could not save config to " + chestConfig, e);
         }
     }
     

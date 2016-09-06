@@ -20,7 +20,7 @@
 
 package net.projectzombie.care_package;
 
-import net.projectzombie.care_package.files.StateFile;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -31,24 +31,25 @@ import org.bukkit.plugin.java.JavaPlugin;
  */
 public class Main extends JavaPlugin {
 
-    private CommandExec commandExecutor;
+    private static Plugin PLUGIN = null;
+
+    static protected Plugin getPlugin() {
+        return PLUGIN;
+    }
 
     @Override
     public void onEnable()
     {
-        StateFile.onEnable(this);
-        commandExecutor = new CommandExec();
-        commandExecutor.onEnable();
-
-        this.getCommand("cp").setExecutor(commandExecutor);
-        this.getLogger().info("Care Package Enabled!");
+        PLUGIN = this;
+        PackageHandler.instance().onEnable();
+        this.getCommand("cp").setExecutor(CommandExec.instance());
+        this.getLogger().info("CarePackageDrops Enabled!");
     }
 
     @Override
     public void onDisable()
     {
-        StateFile.onDisable();
-        commandExecutor.onDisable();
-        this.getLogger().info("CarePackage disabled");
+        PackageHandler.instance().onDisable();
+        this.getLogger().info("CarePackageDrops Disabled!");
     }
 }
