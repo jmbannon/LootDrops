@@ -18,6 +18,15 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.0.2</version>
+				<configuration>
+					<outputDirectory>${basedir}/../libs</outputDirectory>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -43,14 +52,14 @@
 			<artifactId>CustomInteractions</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/../CustomInteractions/target/CustomInteractions-1.0-SNAPSHOT.jar</systemPath>
+			<systemPath>${basedir}/../libs/CustomInteractions-1.0-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>net.projectzombie</groupId>
 			<artifactId>RegionRotation</artifactId>
 			<version>1.0-SNAPSHOT</version>
 			<scope>system</scope>
-			<systemPath>${basedir}/../RegionRotation/target/RegionRotation-1.0-SNAPSHOT.jar</systemPath>
+			<systemPath>${basedir}/../libs/RegionRotation-1.0-SNAPSHOT.jar</systemPath>
 		</dependency>
 		<dependency>
 			<groupId>com.sk89q</groupId>
