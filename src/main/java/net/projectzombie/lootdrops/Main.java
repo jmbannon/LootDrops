@@ -18,7 +18,7 @@
  *
  */
 
-package net.projectzombie.care_package;
+package net.projectzombie.lootdrops;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;

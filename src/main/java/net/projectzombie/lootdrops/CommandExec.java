@@ -18,7 +18,7 @@
  *
  */
 
-package net.projectzombie.care_package;
+package net.projectzombie.lootdrops;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

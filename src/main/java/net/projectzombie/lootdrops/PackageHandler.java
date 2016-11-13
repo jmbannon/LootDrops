@@ -17,7 +17,7 @@
  * timer.
  *
  */
-package net.projectzombie.care_package;
+package net.projectzombie.lootdrops;
 
 import java.io.File;
 import java.io.IOException;

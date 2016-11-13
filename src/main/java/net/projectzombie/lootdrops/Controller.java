@@ -1,7 +1,7 @@
-package net.projectzombie.care_package;
+package net.projectzombie.lootdrops;
 
-import net.projectzombie.region_rotation.modules.StateController;
-import net.projectzombie.region_rotation.modules.StateControllers;
+import net.projectzombie.regionrotation.modules.StateController;
+import net.projectzombie.regionrotation.modules.StateControllers;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
